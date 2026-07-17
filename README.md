@@ -1,8 +1,9 @@
 # douyin review skills
 
-抖音创作者后台**周度数据分析复盘**技能。把一周的运营数据（Excel 表 + 后台截图）丢给它，自动按既定分析框架生成一份可视化 HTML 复盘报告。
+抖音创作者后台**周度数据分析复盘**技能。把一周的运营数据（Excel 表 + 后台截图）丢给任意支持的 agent，自动按既定分析框架生成一份可视化 HTML 复盘报告。
 
 > 适合：抖音短视频账号运营者、新媒体团队，做每周数据复盘 / 周报 / 归因分析。
+> 🔌 **跨平台**：标准文件 `AGENTS.md` 同时兼容 WorkBuddy / Claude Code / Cursor / Cline / Roo / Codex 等主流 agent 软件（详见「安装」）。
 
 ---
 
@@ -16,51 +17,54 @@
 
 ### 它**不**做什么
 
-- 不登录抖音后台抓数据（后台需扫码/验证码，本环境无浏览器自动化能力）。
+- 分析技能本身不登录抖音后台（后台需扫码/验证码，且本环境无浏览器自动化能力）。配套的导出脚本 `douyin_export.py` 由你在**本地终端**运行、手动扫码完成导出，登录态不出本机。
 - 不碰"掉粉 / 净增粉丝 / 取关"做归因（这是写进技能红线的基本原则，详见下方注意事项）。
 - 不联网上传你的任何数据，全部本地处理。
 
 ---
 
-## 安装
+## 安装（跨平台）
 
-### 前提
-
-- 已安装 [WorkBuddy](https://www.codebuddy.cn/)（技能运行宿主）。
-- 宿主环境自带 Node.js 与 Python 隔离运行时，通常无需额外配置。
-
-### 方式一：一键安装（推荐，用户级）
-
-直接复制下面任意一种到终端运行：
-
-**一行命令：**
+本技能提供**统一的分析标准文件 `AGENTS.md`**，可被任意支持指令文件的 agent 软件加载；同时保留 WorkBuddy 专属的 `SKILL.md` 与 Cursor 专属的 `.cursorrules`。先克隆仓库，再按你用的平台选一种方式。
 
 ```bash
-git clone https://github.com/jiajiehu182-del/douyin-review-skills.git ~/.workbuddy/skills/douyin-review-skills
+git clone https://github.com/jack-jiajie/douyin-review-skills.git
+cd douyin-review-skills
 ```
 
-**可重复运行的安装 / 更新脚本（首次安装，之后重复执行即更新）：**
+### 方式一：WorkBuddy
 
 ```bash
-SKILL_DIR="$HOME/.workbuddy/skills/douyin-review-skills"
-REPO="https://github.com/jiajiehu182-del/douyin-review-skills.git"
-if [ -d "$SKILL_DIR/.git" ]; then
-  echo "-> 更新已有 skill ..."; git -C "$SKILL_DIR" pull --ff-only
-else
-  echo "-> 安装 skill ..."; mkdir -p "$HOME/.workbuddy/skills"; git clone "$REPO" "$SKILL_DIR"
-fi
-echo "✅ 已安装到 $SKILL_DIR"
+bash install.sh
+# 或手动：
+# cp -r . ~/.workbuddy/skills/douyin-review-skills
 ```
+重启 / 刷新 WorkBuddy 后，对话中说"做抖音周报 / 数据复盘"即可触发，或 `@skill:douyin-review-skills`。
 
-重启 / 刷新 WorkBuddy 后，在对话中提及"抖音周报""数据复盘"等关键词即可触发，或手动 `@skill:douyin-review-skills`。
+### 方式二：Claude Code / Codex / Cline / Roo Code / Aider
 
-### 方式二：项目级目录
-
-若只想在特定项目生效：
+把 `AGENTS.md` 放到项目根目录（仅当前项目生效），或 `~/.claude/AGENTS.md`（全局生效）：
 
 ```bash
-cp -r douyin-review-skills <你的项目>/.workbuddy/skills/douyin-review-skills
+cp AGENTS.md ./AGENTS.md            # 当前项目
+# cp AGENTS.md ~/.claude/AGENTS.md  # 全局
 ```
+之后在对话里发数据 + "做上周数据复盘"即可。
+
+### 方式三：Cursor
+
+把 `.cursorrules` 复制到项目根目录作为 Cursor 指令：
+
+```bash
+cp .cursorrules ./.cursorrules
+# 或放入 .cursor/rules/douyin-review.mdc（内容同上）
+```
+
+### 方式四：通用 / 其它 agent
+
+直接把 `AGENTS.md` 的全文粘贴进系统提示词，或作为附件 / 上下文发给 agent，它就会按标准出报告。
+
+> 💡 `SKILL.md`、`AGENTS.md`、`.cursorrules` 三者内容保持一致，`AGENTS.md` 为跨平台统一源；修改标准时优先改 `AGENTS.md` 并同步另两份。
 
 ---
 
@@ -69,9 +73,49 @@ cp -r douyin-review-skills <你的项目>/.workbuddy/skills/douyin-review-skills
 1. 打开抖音创作者后台，导出（或截图）本周的运营数据：
    - Excel：`数据表现_播放量数据` `作品点赞数据` `作品评论数据` `作品分享数据` `主页访问数据` `封面点击率数据` 等。
    - 截图：近 7 日**关注来源**、**单条视频**互动 / 完播数据、粉丝画像（可选）。
-2. 在 WorkBuddy 对话里把这些文件 / 截图一次性发过来，并说：
+2. 在任意支持的 agent 对话里把这些文件 / 截图一次性发过来，并说：
    > "帮我做上周的数据复盘"
-3. 技能会自动解析数据 → 生成 HTML 报告 → 在预览面板打开，并附一段核心结论摘要。
+3. agent 会自动解析数据 → 生成 HTML 报告 → 打开预览（或返回文件路径），并附一段核心结论摘要。
+
+---
+
+## 数据导出（半自动脚本）
+
+分析前需要先拿到数据。抖音后台只能扫码登录、没法全自动，所以本仓库附了一个 **半自动导出脚本** `douyin_export.py`：它打开后台、等你扫码，然后自动把**周维度整体数据**和**近 7 天每条视频的完整明细**抓取备份成图片 + HTML，直接能喂给分析流程（Read 工具看图即取数）。
+
+### 准备（首次，在你的终端）
+
+```bash
+pip install -r requirements.txt
+playwright install chromium
+```
+
+### 运行
+
+```bash
+python douyin_export.py
+```
+
+浏览器弹出 → 用抖音 App 扫码 → 脚本自动抓取，输出到 `douyin_export_output/<今天日期>/`。
+
+### 导出内容
+
+| 文件 | 说明 |
+|---|---|
+| `overview/overview.png` + `.html` | 周维度数据总览整页截图 + 源码 |
+| `videos/<序号>_<标题>/detail.png` + `.html` | 近 7 天每条视频的全部指标（播放/点赞/评论/转发/收藏/完播率/2s 跳出率/涨粉等） |
+| `tables/*.xlsx` | 若页面含标准 `<table>` 则额外解析成 Excel（尽力而为） |
+| `manifest.json` | 本次导出清单（日期 / 视频数 / 文件列表） |
+
+> ⚠️ **已知限制（务必读完）**：抖音后台是强反爬 SPA，页面文案/结构可能随版本变化。脚本用「可见中文文案」做定位（比 CSS 选择器稳），但抖音大改版后可能失效，届时需要按报错微调。反爬风险：若遇到验证码/风控，请当作真人操作、放慢抓取节奏（脚本已加基础反检测参数）。
+
+---
+
+## 端到端工作流
+
+1. **导出（你本地终端）**：`python douyin_export.py` → 扫码 → 拿到 `douyin_export_output/<日期>/` 文件夹。
+2. **分析（WorkBuddy 对话）**：把导出文件夹里的截图 / HTML 发给我，说"做上周数据复盘"。
+3. **交付**：技能按九大板块标准生成 HTML 报告，在预览面板打开，并附核心结论摘要。
 
 ---
 
@@ -92,14 +136,14 @@ cp -r douyin-review-skills <你的项目>/.workbuddy/skills/douyin-review-skills
 ### 触发方式
 
 - 自然语言：发数据 + "做周报 / 数据分析复盘 / 数据归因"。
-- 显式调用：`@skill:douyin-review-skills` 后附数据。
+- WorkBuddy 显式调用：`@skill:douyin-review-skills` 后附数据；其它平台加载 `AGENTS.md` / `.cursorrules` 后直接对话即可。
 
 ### 执行流程（技能内部）
 
-1. 读数据：Node `xlsx` 解析 Excel，`Read` 直接读截图取数。
+1. 读数据：用环境可用方式解析 Excel（Python openpyxl/pandas、Node xlsx，或用户直接贴数字），用读取图片的能力直接取截图数。
 2. 算指标：周合计、日环比、关键变幅（峰值、周末跌幅、渠道增幅）。
 3. 写报告：单文件 HTML，内联 CSS，Chart.js CDN 画图。
-4. 交付：`present_files` 打开预览 + 文字结论摘要。
+4. 交付：返回 / 打开 HTML 报告 + 文字结论摘要。
 
 ---
 
@@ -149,16 +193,29 @@ cp -r douyin-review-skills <你的项目>/.workbuddy/skills/douyin-review-skills
 ### 数据与隐私
 
 - 所有数据**仅在本地处理**，不会上传任何服务器。
-- 抖音后台需登录才能进，技能**不会**尝试代登录；请自己导出 / 截图后提供。
+- 抖音后台需登录才能进，分析技能**不会**尝试代登录；导出脚本 `douyin_export.py` 的扫码登录在你本机完成，登录态仅存于本地浏览器 profile（`~/.douyin_export_profile`），不上传。
 
 ### 其他
 
 - 报告样例基准见同目录 `SKILL.md` 引用的 `抖音周度数据分析报告_0706-0712.html`。
-- 改标准只需编辑 `SKILL.md`；红线措辞调整请同步更新本文档。
+- 改标准**优先编辑 `AGENTS.md`**（跨平台统一源），再同步 `SKILL.md` 与 `.cursorrules`；红线措辞调整请同步更新本文档。
 
 ---
 
 ## 更新日志
+
+### v2.0.0 (2026-07-17)
+
+- **跨平台兼容**：新增统一的 `AGENTS.md` 指令源，可同时用于 WorkBuddy / Claude Code / Codex / Cline / Roo Code / Aider / Cursor / 通用 agent；新增 `.cursorrules`（Cursor 专属）与多平台安装指引。
+- 去掉 WorkBuddy 专属工具路径（如 `NODE_PATH` 绝对路径、`present_files`），改为"用任意可用方式解析 / 返回"的通用表述，标准不再绑定单一平台。
+- 重写 README「安装」为四种平台方式；修正执行流程 / 触发方式中的平台专属措辞。
+- `SKILL.md` 版本号升至 2.0.0，注明 v2 起提供跨平台变体。
+
+### v1.1.0 (2026-07-16)
+
+- 新增半自动数据导出脚本 `douyin_export.py` + `requirements.txt`：本地运行、扫码后自动备份周维度总览与近 7 天每条视频明细（截图 + HTML + 尽力解析表格）。
+- 新增端到端工作流与导出脚本使用说明。
+- 修正 README / install.sh 仓库地址为 `jack-jiajie/douyin-review-skills`。
 
 ### v1.0.0 (2026-07-13)
 
@@ -172,8 +229,13 @@ cp -r douyin-review-skills <你的项目>/.workbuddy/skills/douyin-review-skills
 
 ```
 douyin-review-skills/
-├── SKILL.md      # 技能定义与执行标准（触发、板块结构、红线清单）
-└── README.md     # 本文件
+├── AGENTS.md           # 跨平台统一指令源（Claude Code/Codex/Cline/Roo/通用均可用）
+├── SKILL.md            # WorkBuddy 专属技能定义（触发、板块结构、红线清单）
+├── .cursorrules        # Cursor 专属指令（镜像 AGENTS.md）
+├── README.md           # 本文件（含多平台安装、导出脚本说明与端到端流程）
+├── install.sh          # 一键安装 / 更新（WorkBuddy + 顺带放置 AGENTS.md/.cursorrules）
+├── douyin_export.py    # 半自动数据导出脚本（本地运行，扫码后自动备份）
+└── requirements.txt    # 导出脚本的 Python 依赖
 ```
 
 ---
