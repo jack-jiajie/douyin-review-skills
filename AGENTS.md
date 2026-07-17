@@ -1,28 +1,13 @@
----
-name: douyin-review-skills
-description: "当用户提供抖音创作者后台的周维度运营数据（Excel 数据表 / 后台截图），并要求做'数据分析复盘 / 周报 / 数据归因'时，按既定标准生成一份可视化 HTML 复盘报告。覆盖数据下降归因、上周数据复盘、近7日关注来源、重点数据关注、单条视频深度拆解、亮点、待优化、后续策略、重点工作方向九大维度，并遵循'去AI味 + 客观归因 + 积极引导 + 不碰掉粉维度'的硬性风格标准。"
-description_zh: "抖音周度数据分析复盘（按调试标准执行）"
-description_en: "Douyin review skills"
-version: 2.0.0
-agent_created: true
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
-  - AskUserQuestion
-display_name: "douyin review skills"
-display_name_en: "douyin review skills"
-visibility: "public"
----
+# 抖音周度数据分析复盘（跨平台指令 · v2.0.0）
 
-# 抖音周度数据分析复盘
+> 本文档是平台中立的分析标准，可被任意支持指令文件的 agent 软件直接使用
+> （Claude Code / Codex / Cline / Roo Code / Aider / Cursor 等）。
+> WorkBuddy 用户请优先用同目录 `SKILL.md`；其它平台直接加载本文件即可。
+> 三者内容保持一致，以本文件为跨平台统一源。
 
-当用户甩过来一周的抖音后台数据（Excel 表 + 截图），并要求做数据分析复盘时，按本 skill 的标准输出一份**可视化 HTML 复盘报告**。
+当用户甩过来一周的抖音后台数据（Excel 表 + 截图），并要求做数据分析复盘时，按本标准输出一份**可视化 HTML 复盘报告**。
 
-本 skill 的核心价值不是"读数据"，而是**按已和用户对齐的分析框架与表达标准**出报告——尤其是几条反复调过的硬性规则（见下方「红线清单」），必须严格遵守。
+本技能的核心价值不是"读数据"，而是**按已和用户对齐的分析框架与表达标准**出报告——尤其是几条反复调过的硬性规则（见下方「红线清单」），必须严格遵守。
 
 ---
 
@@ -32,9 +17,9 @@ visibility: "public"
 - 用户说"做周报""数据分析复盘""数据归因""上周数据怎么样"等。
 - 用户明确要求"按之前的标准来"。
 
-> 抖音后台必须登录才能进，本环境无浏览器自动化能力，**不要尝试自己登录后台抓数据**。若用户只给了链接没给数据，先请对方把 Excel 表和截图发过来（参考下方所需字段）。
+> 抖音后台必须登录才能进，**不要尝试自己登录后台抓数据**。若用户只给了链接没给数据，先请对方把 Excel 表和截图发过来（参考下方所需字段）。
 >
-> 配套半自动导出脚本 `douyin_export.py`（随本 skill 一起安装）可在**用户本地终端**运行：它打开后台、等用户扫码，自动备份周维度总览与近 7 天每条视频明细。登录态仅存于用户本机，不上传；抖音大改版后脚本定位文案可能需微调。
+> 配套半自动导出脚本 `douyin_export.py`（随本技能一起提供）可在**用户本地终端**运行：它打开后台、等用户扫码，自动备份周维度总览与近 7 天每条视频明细。登录态仅存于用户本机，不上传；抖音大改版后脚本定位文案可能需微调。
 
 ---
 
@@ -45,7 +30,7 @@ visibility: "public"
 - 净增粉丝、取关粉丝、总粉丝量（用于数据总览 KPI，但**不进趋势图、不进下降归因**）
 - 单条视频明细（标题、发布时间、播放、点赞、评论、转发、完播率/人均时长、涨粉数、2s 跳出率）
 
-**截图（用户通常直接发图，用 Read 读图取数）**
+**截图（用户通常直接发图，用读取图片的能力取数）**
 - 近7日关注来源及占比（视频推荐 / 我的主页 / 搜索 / 关注页 / 直播页 / 其他）
 - 单条视频的互动与完播数据
 - 粉丝画像（性别 / 年龄 / 地域，可选）
@@ -57,8 +42,8 @@ visibility: "public"
 ## 三、执行步骤
 
 1. **读数据**
-   - Excel 解析：`Bash` 用 Node `xlsx` 库（`NODE_PATH=/Users/xdf/.workbuddy/binaries/node/workspace/node_modules /Users/xdf/.workbuddy/binaries/node/versions/22.22.2/bin/node -e "..."`）或 Python `openpyxl`。优先 Node xlsx，环境已装。
-   - 截图：`Read` 工具直接读图取数。
+   - Excel 解析：用你环境中可用的任意方式（Python `openpyxl` / `pandas`、Node `xlsx`、或让用户在对话里直接贴数字），优先结构化读取。
+   - 截图：用读取图片的能力直接取数。
    - 把每日数据整理成结构化数组（日期、播放、点赞、评论、分享、主页访问、封面CTR、净增粉、取关等）。
 
 2. **算指标**
@@ -68,10 +53,10 @@ visibility: "public"
 3. **写 HTML 报告**
    - 单文件 HTML，内联 CSS，图表用 Chart.js CDN（`https://cdn.jsdelivr.net/npm/chart.js`）。
    - 严格按下方「报告板块结构」组织，遵守「红线清单」。
-   - 语言：简体中文；风格：去 AI 味（参考 `humanizer` / `去AI味` skill 的禁忌清单）。
+   - 语言：简体中文；风格：去 AI 味（少破折号堆砌、机械加粗、排比三连、促销腔；用具体细节替代空泛断言；中文用中文引号「」）。
 
 4. **交付**
-   - `present_files` 打开 HTML 预览，并附一段核心结论摘要（不要只说"报告已生成"，要给出 2-3 条最重要的信号）。
+   - 把生成的 HTML 文件路径返回给用户（在支持预览的环境打开预览），并附一段核心结论摘要（不要只说"报告已生成"，要给出 2-3 条最重要的信号）。
 
 ---
 
@@ -133,7 +118,7 @@ visibility: "public"
 3. **不堆数据**：每个数据都要配"为什么"（归因 / 客观判断），杜绝只甩数字的表格。
 4. **客观 + 积极引导**：尤其板块二，归因结尾一律往建设性、积极面收。
 5. **单条视频双栏分析**：数据 + 「值得沉淀 / 需提升」两栏，严重问题标红。
-6. **去 AI 味**：参考 `humanizer` / `去AI味` skill——少用破折号、机械加粗、排比三连、促销腔；用具体细节替代空泛断言；中文用中文引号。
+6. **去 AI 味**：少破折号堆砌、机械加粗、排比三连、促销腔；用具体细节替代空泛断言；中文用中文引号「」。
 
 ---
 
@@ -147,8 +132,17 @@ visibility: "public"
 
 ---
 
-## 七、参考
+## 七、配套资源
 
-- 去 AI 味表达标准：见 `humanizer` / 用户附加的 `去AI味` skill。
-- 已调试定稿的报告样例（本 skill 的产出基准）：用户工作区 `抖音周度数据分析报告_0706-0712.html`。
-- **跨平台（v2.0.0 起）**：同目录 `AGENTS.md` 为平台中立的统一指令源，可被 Claude Code / Codex / Cline / Roo / Cursor / 通用 agent 直接加载；`.cursorrules` 为 Cursor 专属变体。本 `SKILL.md` 是 WorkBuddy 专属变体，保留了 WorkBuddy 运行时的最优路径（如 `NODE_PATH`、本机 Python/Node 隔离环境、`present_files`）。改标准请优先编辑 `AGENTS.md` 并同步本文件与 `.cursorrules`。
+- **半自动导出脚本** `douyin_export.py`（需 `requirements.txt` 中的 Python 依赖）：用户在**本地终端**运行，扫码后自动备份周维度总览与近 7 天每条视频明细，输出到 `douyin_export_output/<日期>/`。
+- **去 AI 味表达标准**：见同目录说明或 humanizer / 去AI味 类技能。
+- **报告样例基准**：见用户工作区 `抖音周度数据分析报告_0706-0712.html`（本技能产出风格参考）。
+
+---
+
+## 八、跨平台安装指引（简版，详见 README.md）
+
+- **WorkBuddy**：将整个仓库放到 `~/.workbuddy/skills/douyin-review-skills/`。
+- **Claude Code / Codex / Cline / Roo / Aider**：把 `AGENTS.md` 放到项目根目录（或 `~/.claude/AGENTS.md` 全局）。
+- **Cursor**：把 `.cursorrules`（或 `.cursor/rules/douyin-review.mdc`）内容设为 `AGENTS.md` 的副本。
+- **通用**：直接把 `AGENTS.md` 全文粘贴进对话 / 系统提示，或作为附件发给 agent。
