@@ -172,6 +172,13 @@ cp -r douyin-review-skills <你的项目>/.workbuddy/skills/douyin-review-skills
 - 固化九大板块结构与六条红线标准（板块二不碰掉粉、趋势图不含净增粉丝、单条视频双栏分析、客观积极引导、去 AI 味）。
 - 支持 Node `xlsx` 解析 Excel + `Read` 读截图，输出 Chart.js 可视化 HTML 报告。
 
+### v3.2(2026-07-20)
+- 新增先检验在输出的规则，优化了数据分析的准确性。
+- 集成去AI味skills、图片识别优化skills。
+- 恢复亮点/待优化/优化策略三个独立板块。
+- 数据趋势图改双Y轴设计，解决量级悬殊不可读的问题。
+- skills文件整理。
+
 ---
 
 ## 目录结构
