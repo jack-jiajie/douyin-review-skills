@@ -63,6 +63,7 @@ visibility: "public"
 | 去 AI 味写作标准 | `references/05-deai-style.md` | humanizer 集成、禁用清单、自查 |
 | 截图 OCR 实操 | `references/06-ocr-guide.md` | 腾讯云高精度 OCR（首选）+ 本地 tesseract 兜底 |
 | 输出模板与交付话术 | `references/07-output-template.md` | HTML/CSS/Chart.js 骨架 + 给用户的汇报话术 |
+| 更新日志（版本备份） | `CHANGELOG.md` | 每次迭代的版本号、触发原因、具体改动留存 |
 
 **推荐执行顺序**：先读 `00-calibration.md` 做阶段0 → 用户确认后读 `01-report-structure.md` + `02-three-in-one.md` 写正文 → 画图表前读 `03-chart-design.md` → 成稿前读 `05-deai-style.md` 过机器腔 → 写图识别有问题时读 `06-ocr-guide.md`。
 
